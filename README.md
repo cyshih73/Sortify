@@ -12,7 +12,7 @@ A python, API based tool to sort the playlist by album release date
 3. A playlist named [Name of target playlist]_sorted will be in your list of playlists
 
 ## Notes
-1. The playlist need to be **privated**
+1. The playlist need to be **private**
 2. If the list name contains spaces, add quotation marks while running instruction 2
     - e.g. Get HYPED -> "Get HYPED"
 
@@ -20,3 +20,4 @@ A python, API based tool to sort the playlist by album release date
 1. Confirm which scopes are needed
 2. Auto OAuth
 3. Add more sort keys
+4. W
