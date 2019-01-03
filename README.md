@@ -3,11 +3,12 @@ A python, API based tool to sort the playlist by album release date
 
 ## Requirements
 - python    3.6
-- spotipy   1.4.4 (pip3 install spotipy)
+- [spotipy](https://github.com/plamere/spotipy)   1.4.4 (pip3 install spotipy)
 
 ## Instructions
 1. Get your OAuth2 token on [SpotifyAPI](https://developer.spotify.com/console/get-track), "OAuth Token" section
 > Before the author confirm which scopes are needed, please check all the scopes xD
+![spotify](https://i.imgur.com/sBX2QP4.png)
 2. python main.py -l [Name of target playlist] -u [Your username] -a [OAuth Token]
 3. A playlist named [Name of target playlist]_sorted will be in your list of playlists
 
