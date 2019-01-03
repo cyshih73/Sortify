@@ -14,10 +14,10 @@ A python, API based tool to sort the playlist by album release date
 ## Notes
 1. The playlist need to be **private**
 2. If the list name contains spaces, add quotation marks while running instruction 2
-    - e.g. Get HYPED -> "Get HYPED"
+    - e.g. [Name of target playlist]: Get HYPED -> "Get HYPED"
 
 ## TODOs
 1. Confirm which scopes are needed
 2. Auto OAuth
 3. Add more sort keys
-4. W
+4. Web service
