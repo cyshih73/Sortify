@@ -8,26 +8,6 @@ import spotipy.util as util
 import spotipy.oauth2 as oauth2
 from argparse import ArgumentParser
 
-def auth(username, id, secret):
-    token = util.prompt_for_user_token(
-        username=username,
-        scope='playlist-modify-private playlist-modify-public',
-        client_id=id,
-        client_secret=secret,
-        redirect_uri='http://localhost')
-    return token
-
-def get_token(token, client_id, client_secret):
-    uri = 'https://accounts.spotify.com/api/token'
-    payload = { 'grant_type': 'authorization_code',
-                'code': token,
-                'client_id': client_id,
-                'client_secret': client_secret,
-                'redirect_uri': 'http://localhost'
-            }
-    response = requests.post(uri, data=payload)
-    return response.json()['access_token']
-
 def get_playlists(token):
     uri = 'https://api.spotify.com/v1/me/playlists'
     header = { 'Content-Type': 'application/json', 'Authorization': token }
@@ -108,7 +88,6 @@ def main(args):
 
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument("--auth", action='store_true')
     parser.add_argument("-u", "--user", type=str, help="UserName", required=True, dest="username")
     parser.add_argument("-l", "--list", type=str, help="playlist Name", required=True, dest="pl_name")
     parser.add_argument("-a", "--access_token", type=str, help="access_token", required=True, dest="access_token")
