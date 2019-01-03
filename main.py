@@ -3,9 +3,6 @@
 # https://developer.spotify.com/console/get-track
 import json
 import requests
-import spotipy
-import spotipy.util as util
-import spotipy.oauth2 as oauth2
 from argparse import ArgumentParser
 
 def get_playlists(token):
