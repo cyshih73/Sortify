@@ -1,4 +1,4 @@
-# spotify_sort
+# Sortify
 A python, API based tool to sort the playlist by album release date
 
 ## Requirements
@@ -19,3 +19,4 @@ A python, API based tool to sort the playlist by album release date
 ## TODOs
 1. Confirm which scopes are needed
 2. Auto OAuth
+3. Add more sort keys
