@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 # Get your access token on:
 # https://developer.spotify.com/console/get-track
-import json
+
 import requests
 from argparse import ArgumentParser
 
@@ -10,14 +10,32 @@ def error(response):
     print("E: %d - %s" % (response.status_code, response.json()['error']['message']))
     exit()
 
-# Get all the playlists from user
-def get_playlists(token):
-    uri = 'https://api.spotify.com/v1/me/playlists'
+
+# Get the target playlist's name and tracks
+def get_playlist(token, pl_id):
     header = { 'Content-Type': 'application/json', 'Authorization': token }
-    response = requests.get(uri, headers=header)
+    
+    # Get the playlist name
+    uri = 'https://api.spotify.com/v1/playlists/%s' % pl_id
+    field = uri + '?fields=name'
+    response = requests.get(field, headers=header)
     if response.status_code != 200: error(response)
-    print("User has %d lists." % len(response.json()['items']))
-    return response.json()['items']
+    pl_name = response.json()['name']
+
+    # Get the tracks
+    uri, tracks = 'https://api.spotify.com/v1/playlists/%s/tracks' % pl_id, []
+    # Only 100 data can be retrieved at once
+    count, total = 0, 1000
+    while count < total:
+        field = uri+'?fields=total,items(track(name,id,album(release_date)))&limit=50&offset=%d' % count
+        response = requests.get(field, headers=header)
+        if response.status_code != 200: error(response)
+        total = response.json()['total']
+        tracks = tracks + response.json()['items']
+        count += 50
+
+    print("Got %d tracks in playlist \"%s.\"" % (total, pl_name))
+    return pl_name, tracks
 
 # Create the "_sorted" playlist
 def create_playlist(token, username, pl_name):
@@ -30,28 +48,9 @@ def create_playlist(token, username, pl_name):
     print(response.json()['name'] + ' Created.')
     return response.json()['id']
 
-# Get the tracks from target playlist
-def get_playlist(token, list_id):
-    uri = 'https://api.spotify.com/v1/playlists/%s/tracks' % list_id
-    header = { 'Content-Type': 'application/json', 'Authorization': token }
-    
-    tracks = []
-    # Only 100 data can be retrieved at once
-    count, total = 0, 1000
-    while count < total:
-        field = uri+'?fields=total,items(track(name,id,album(release_date)))&limit=100&offset=%d' % count
-        response = requests.get(field, headers=header)
-        if response.status_code != 200: error(response)
-        total = response.json()['total']
-        tracks = tracks + response.json()['items']
-        count += 100
-
-    print("Got %d tracks in %s." % (total, list_id))
-    return tracks
-
 # Put the tracks into new playlists
-def put_into_pl(token, list_id, tracks):
-    uri = 'https://api.spotify.com/v1/playlists/%s/tracks' % list_id
+def put_into_pl(token, pl_id, tracks):
+    uri = 'https://api.spotify.com/v1/playlists/%s/tracks' % pl_id
     header = { 'Content-Type': 'application/json', 'Authorization': token }
     payload = { 'uris': tracks }
 
@@ -70,28 +69,16 @@ def chunks(l, n):
     for i in range(0, len(l), n): yield l[i:i+n]
 
 def main(args):
-    if args.access_token: token = args.access_token
+    token = 'Bearer ' + args.access_token
 
-    # Working on playlists
-    token = 'Bearer ' + token
-    pls = get_playlists(token)
-
-    npl_id, pl_id, not_created = '', '', True
-    for pl in pls:
-        if pl['name'] == args.pl_name: pl_id = pl['id']
-        elif (pl['name'] == args.pl_name+'_sorted'): 
-            not_created = False
-            npl_id = pl['id']
-
-    if pl_id and not_created: 
-        npl_id = create_playlist(token, args.username, args.pl_name)
-
-    tracks = get_playlist(token, pl_id)
+    pl_name, tracks = get_playlist(token, args.pl_id)
     tracks.sort(key=json_key, reverse=True)
     tracks_uris = []
     for i in range(len(tracks)):
         tracks_uris.append('spotify:track:' + tracks[i]['track']['id'])
         print(tracks[i]['track']['album']['release_date'], tracks[i]['track']['name'])
+
+    npl_id = create_playlist(token, args.username, pl_name)
 
     # Only 100 data can be retrieved at once
     tracks_uris = list(chunks(tracks_uris, 80))
@@ -101,7 +88,7 @@ def main(args):
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument("-u", "--user", type=str, help="UserName", required=True, dest="username")
-    parser.add_argument("-l", "--list", type=str, help="playlist Name", required=True, dest="pl_name")
+    parser.add_argument("-i", "--pid", type=str, help="Playlist Id", required=True, dest="pl_id")
     parser.add_argument("-a", "--access_token", type=str, help="access_token", required=True, dest="access_token")
     args = parser.parse_args()
     main(args)
