@@ -1,7 +1,4 @@
 # -*- coding: UTF-8 -*-
-# Get your access token on:
-# https://developer.spotify.com/console/get-track
-
 import requests
 from argparse import ArgumentParser
 
@@ -80,7 +77,7 @@ def main(args):
 
     npl_id = create_playlist(token, args.username, pl_name)
 
-    # Only 100 data can be retrieved at once
+    # Only 100 rows can be retrieved at once
     tracks_uris = list(chunks(tracks_uris, 80))
     for tracks_uri in tracks_uris:
         put_into_pl(token, npl_id ,tracks_uri)
